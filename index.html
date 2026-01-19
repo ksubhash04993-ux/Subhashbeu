@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Subhash Website | BEU Bulk Result</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .box {
+      background: rgba(0, 0, 0, 0.65);
+      padding: 30px;
+      width: 360px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00e5ff;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 5px;
+      color: #00e5ff;
+    }
+
+    p {
+      text-align: center;
+      font-size: 13px;
+      color: #ccc;
+      margin-top: 0;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 12px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+    }
+
+    button {
+      background: #00e5ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00bcd4;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #00ff88;
+      text-align: center;
+    }
+
+    footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+    <h2>Welcome to Subhash Website</h2>
+    <p>BEU Bulk Result Downloader (CSV)</p>
+
+    <input type="number" id="startReg" placeholder="Start Registration Number">
+    <input type="number" id="endReg" placeholder="End Registration Number">
+
+    <select id="sem">
+      <option value="">Select Semester</option>
+      <option value="1st">1st</option>
+      <option value="2nd">2nd</option>
+      <option value="3rd">3rd</option>
+      <option value="4th">4th</option>
+      <option value="5th">5th</option>
+      <option value="6th">6th</option>
+      <option value="7th">7th</option>
+      <option value="8th">8th</option>
+    </select>
+
+    <select id="session">
+      <option value="">Select Session</option>
+    </select>
+
+    <button onclick="downloadResult()">Download CSV</button>
+
+    <div id="status"></div>
+
+    <footer>© 2026 Subhash</footer>
+  </div>
+
+<script>
+  // Auto session load
+  const sessionSelect = document.getElementById("session");
+  const year = new Date().getFullYear();
+  for (let y = year; y >= year - 6; y--) {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.text = y;
+    sessionSelect.appendChild(opt);
+  }
+
+  function downloadResult() {
+    const startReg = document.getElementById("startReg").value;
+    const endReg = document.getElementById("endReg").value;
+    const sem = document.getElementById("sem").value;
+    const session = document.getElementById("session").value;
+
+    if (!startReg || !endReg || !sem || !session) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    document.getElementById("status").innerText =
+      "Processing... please wait (CSV will download automatically)";
+
+    fetch("https://back-end-1zhy.onrender.com/bulk-result", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        start_reg: startReg,
+        end_reg: endReg,
+        sem: sem,
+        session: session
+      })
+    })
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "beu_results_with_marks.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      document.getElementById("status").innerText =
+        "CSV downloaded successfully ✅";
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("status").innerText =
+        "Error occurred ❌ Check backend";
+    });
+  }
+</script>
+
+</body>
+</html>
